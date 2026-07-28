@@ -752,6 +752,7 @@ html&gt;body{padding:0}&lt;/style&gt;
   &lt;div class=&quot;zvl-toolbar&quot;&gt;
     &lt;button id=&quot;zvl-run&quot; class=&quot;btn btn-primary&quot; type=&quot;button&quot;&gt;运行&lt;/button&gt;
     &lt;button id=&quot;zvl-step&quot; class=&quot;btn&quot; type=&quot;button&quot;&gt;单步&lt;/button&gt;
+    &lt;button id=&quot;zvl-apply&quot; class=&quot;btn&quot; type=&quot;button&quot;&gt;应用修改（保留进度）&lt;/button&gt;
     &lt;button id=&quot;zvl-reset&quot; class=&quot;btn btn-ghost&quot; type=&quot;button&quot;&gt;按当前参数重置&lt;/button&gt;
     &lt;label class=&quot;form-label&quot; for=&quot;zvl-speed&quot;&gt;
       播放速度
@@ -761,6 +762,7 @@ html&gt;body{padding:0}&lt;/style&gt;
         &lt;option value=&quot;35&quot;&gt;快速&lt;/option&gt;
       &lt;/select&gt;
     &lt;/label&gt;
+    &lt;span id=&quot;zvl-apply-note&quot; class=&quot;text-small text-muted&quot;&gt;中途修改倍数、比例或自然票率后，点击“应用修改”。&lt;/span&gt;
   &lt;/div&gt;
 
   &lt;details class=&quot;zvl-parameters&quot;&gt;
@@ -782,6 +784,7 @@ html&gt;body{padding:0}&lt;/style&gt;
       &lt;/label&gt;
       &lt;label class=&quot;form-label&quot; for=&quot;zvl-trigger-rank&quot;&gt;开始下降的赛罗名次
         &lt;select id=&quot;zvl-trigger-rank&quot; class=&quot;form-select&quot;&gt;
+          &lt;option value=&quot;none&quot;&gt;无（按保持时间）&lt;/option&gt;
           &lt;option value=&quot;2&quot;&gt;第2名&lt;/option&gt;
           &lt;option value=&quot;3&quot;&gt;第3名&lt;/option&gt;
           &lt;option value=&quot;4&quot;&gt;第4名&lt;/option&gt;
@@ -789,6 +792,9 @@ html&gt;body{padding:0}&lt;/style&gt;
           &lt;option value=&quot;6&quot;&gt;第6名&lt;/option&gt;
           &lt;option value=&quot;7&quot; selected&gt;第7名&lt;/option&gt;
         &lt;/select&gt;
+      &lt;/label&gt;
+      &lt;label class=&quot;form-label&quot; for=&quot;zvl-peak-hold-seconds&quot;&gt;峰值保持时间（秒）
+        &lt;input id=&quot;zvl-peak-hold-seconds&quot; class=&quot;form-control&quot; type=&quot;number&quot; min=&quot;0&quot; step=&quot;1&quot; value=&quot;0&quot;&gt;
       &lt;/label&gt;
       &lt;label class=&quot;form-label&quot; for=&quot;zvl-fall-seconds&quot;&gt;下降用时（秒）
         &lt;input id=&quot;zvl-fall-seconds&quot; class=&quot;form-control&quot; type=&quot;number&quot; min=&quot;1&quot; step=&quot;1&quot; value=&quot;60&quot;&gt;
@@ -801,7 +807,7 @@ html&gt;body{padding:0}&lt;/style&gt;
       &lt;/label&gt;
     &lt;/div&gt;
 
-    &lt;div class=&quot;zvl-section-label&quot;&gt;路人票分配比例：赛罗未垫底&lt;/div&gt;
+    &lt;div class=&quot;zvl-section-label&quot;&gt;路人票分配比例：普通策略&lt;/div&gt;
     &lt;div class=&quot;zvl-fields&quot;&gt;
       &lt;label class=&quot;form-label&quot; for=&quot;zvl-before-ahead-near&quot;&gt;前一名（%）
         &lt;input id=&quot;zvl-before-ahead-near&quot; class=&quot;form-control&quot; type=&quot;number&quot; min=&quot;0&quot; max=&quot;100&quot; step=&quot;1&quot; value=&quot;40&quot;&gt;
@@ -817,7 +823,7 @@ html&gt;body{padding:0}&lt;/style&gt;
       &lt;/label&gt;
     &lt;/div&gt;
 
-    &lt;div class=&quot;zvl-section-label&quot;&gt;路人票分配比例：赛罗垫底后&lt;/div&gt;
+    &lt;div class=&quot;zvl-section-label&quot;&gt;路人票分配比例：反超防御策略&lt;/div&gt;
     &lt;div class=&quot;zvl-fields&quot;&gt;
       &lt;label class=&quot;form-label&quot; for=&quot;zvl-after-ahead-near&quot;&gt;前一名（%）
         &lt;input id=&quot;zvl-after-ahead-near&quot; class=&quot;form-control&quot; type=&quot;number&quot; min=&quot;0&quot; max=&quot;100&quot; step=&quot;1&quot; value=&quot;40&quot;&gt;
@@ -832,7 +838,7 @@ html&gt;body{padding:0}&lt;/style&gt;
         &lt;input id=&quot;zvl-after-behind-rest&quot; class=&quot;form-control&quot; type=&quot;number&quot; min=&quot;0&quot; max=&quot;100&quot; step=&quot;1&quot; value=&quot;5&quot;&gt;
       &lt;/label&gt;
     &lt;/div&gt;
-    &lt;div class=&quot;text-small text-muted&quot;&gt;每秒开始时冻结一次排名；四项按固定整数配额分流，“其余”组内随机。空组票流向子集外。&lt;/div&gt;
+    &lt;div class=&quot;text-small text-muted&quot;&gt;程序记录赛罗到达过的最低名次；赛罗从该名次反超一位后，下一秒起永久切换为防御策略。每秒开始时冻结排名，空组票流向子集外。&lt;/div&gt;
 
     &lt;div class=&quot;zvl-section-label&quot;&gt;各角色初始票数与自然票率&lt;/div&gt;
     &lt;div class=&quot;zvl-character-head text-small text-muted&quot;&gt;
@@ -1118,6 +1124,8 @@ html&gt;body{padding:0}&lt;/style&gt;
   const endLabelEl = root.querySelector(&#x27;#zvl-end-label&#x27;);
   const runEl = root.querySelector(&#x27;#zvl-run&#x27;);
   const stepEl = root.querySelector(&#x27;#zvl-step&#x27;);
+  const applyEl = root.querySelector(&#x27;#zvl-apply&#x27;);
+  const applyNoteEl = root.querySelector(&#x27;#zvl-apply-note&#x27;);
   const resetEl = root.querySelector(&#x27;#zvl-reset&#x27;);
   const speedEl = root.querySelector(&#x27;#zvl-speed&#x27;);
 
@@ -1131,6 +1139,9 @@ html&gt;body{padding:0}&lt;/style&gt;
   let allocations;
   let lostRouteVotes;
   let lastDeltas;
+  let worstZeroRank;
+  let defenseActive;
+  let defenseStart;
   let timer = null;
 
   function buildCharacterInputs() {
@@ -1149,6 +1160,7 @@ html&gt;body{padding:0}&lt;/style&gt;
   }
 
   function readParams() {
+    const triggerRankValue = root.querySelector(&#x27;#zvl-trigger-rank&#x27;).value;
     return {
       initialVotes: names.map((name, index) =&gt; numberValue(`#zvl-vote-${index}`, defaultVotes[index], 0)),
       naturalRates: names.map((name, index) =&gt; numberValue(`#zvl-rate-${index}`, defaultRates[index], 0)),
@@ -1156,15 +1168,18 @@ html&gt;body{padding:0}&lt;/style&gt;
       peakRatio: numberValue(&#x27;#zvl-peak-ratio&#x27;, 10, 0),
       finalRatio: numberValue(&#x27;#zvl-final-ratio&#x27;, 4, 0),
       riseSeconds: numberValue(&#x27;#zvl-rise-seconds&#x27;, 60, 1),
-      triggerRank: numberValue(&#x27;#zvl-trigger-rank&#x27;, 7, 2),
+      triggerRank: triggerRankValue === &#x27;none&#x27;
+        ? null
+        : Math.min(7, numberValue(&#x27;#zvl-trigger-rank&#x27;, 7, 2)),
+      peakHoldSeconds: numberValue(&#x27;#zvl-peak-hold-seconds&#x27;, 0, 0),
       fallSeconds: numberValue(&#x27;#zvl-fall-seconds&#x27;, 60, 1),
-      beforeWeights: [
+      ordinaryWeights: [
         Math.min(100, numberValue(&#x27;#zvl-before-ahead-near&#x27;, 40, 0)),
         Math.min(100, numberValue(&#x27;#zvl-before-behind-near&#x27;, 40, 0)),
         Math.min(100, numberValue(&#x27;#zvl-before-ahead-rest&#x27;, 10, 0)),
         Math.min(100, numberValue(&#x27;#zvl-before-behind-rest&#x27;, 10, 0))
       ],
-      afterWeights: [
+      defenseWeights: [
         Math.min(100, numberValue(&#x27;#zvl-after-ahead-near&#x27;, 40, 0)),
         Math.min(100, numberValue(&#x27;#zvl-after-behind-near&#x27;, 20, 0)),
         Math.min(100, numberValue(&#x27;#zvl-after-ahead-rest&#x27;, 35, 0)),
@@ -1234,8 +1249,8 @@ html&gt;body{padding:0}&lt;/style&gt;
   }
 
   function allocateRouteVotes(routeVotes, orderSnapshot) {
-    const { zeroPosition, groups } = groupsFromOrder(orderSnapshot);
-    const weights = zeroPosition === 6 ? params.afterWeights : params.beforeWeights;
+    const { groups } = groupsFromOrder(orderSnapshot);
+    const weights = defenseActive ? params.defenseWeights : params.ordinaryWeights;
     const quotas = integerQuotas(routeVotes, weights);
 
     groups.forEach((members, groupIndex) =&gt; {
@@ -1290,7 +1305,16 @@ html&gt;body{padding:0}&lt;/style&gt;
 
     tick = nextTick;
     const zeroRank = ranking().findIndex((item) =&gt; item.index === 6) + 1;
-    if (declineStart === null &amp;&amp; tick &gt;= params.riseSeconds &amp;&amp; zeroRank &gt;= params.triggerRank) {
+    if (zeroRank &gt; worstZeroRank) {
+      worstZeroRank = zeroRank;
+    } else if (!defenseActive &amp;&amp; zeroRank &lt; worstZeroRank) {
+      defenseActive = true;
+      defenseStart = tick;
+    }
+    const holdComplete = tick &gt;= params.riseSeconds + params.peakHoldSeconds;
+    const timeOnlyTrigger = params.triggerRank === null &amp;&amp; params.peakHoldSeconds &gt; 0;
+    const rankTrigger = params.triggerRank !== null &amp;&amp; zeroRank &gt;= params.triggerRank;
+    if (declineStart === null &amp;&amp; holdComplete &amp;&amp; (timeOnlyTrigger || rankTrigger)) {
       declineStart = tick;
     }
 
@@ -1330,10 +1354,30 @@ html&gt;body{padding:0}&lt;/style&gt;
     allocations = [0, 0, 0, 0, 0, 0];
     lostRouteVotes = 0;
     lastDeltas = [0, 0, 0, 0, 0, 0, 0];
+    worstZeroRank = ranking().findIndex((item) =&gt; item.index === 6) + 1;
+    defenseActive = false;
+    defenseStart = null;
     history = [{
       t: 0,
       votes: votes.slice()
     }];
+    applyNoteEl.textContent = &#x27;已按当前参数重置；初始票数和随机种子已载入。&#x27;;
+    render();
+  }
+
+  function applyLiveParams() {
+    pause();
+    const updated = readParams();
+    params = {
+      ...updated,
+      initialVotes: params.initialVotes,
+      seed: params.seed
+    };
+    currentRatio = ratioAt(tick);
+    if (history.length &gt; params.chartWindow + 1) {
+      history = history.slice(-(params.chartWindow + 1));
+    }
+    applyNoteEl.textContent = `已在第${tick}秒应用；票数、历史和随机序列保持不变。点击“运行”继续。`;
     render();
   }
 
@@ -1434,15 +1478,31 @@ html&gt;body{padding:0}&lt;/style&gt;
     root.querySelector(&#x27;#zvl-time&#x27;).textContent = tick;
     root.querySelector(&#x27;#zvl-rank&#x27;).textContent = zeroRank;
     root.querySelector(&#x27;#zvl-gap&#x27;).textContent = maximumAheadGap;
-    root.querySelector(&#x27;#zvl-trigger-note&#x27;).textContent = declineStart === null
-      ? `到第${params.triggerRank}名后触发下降`
-      : `第${declineStart}秒触发下降`;
+    root.querySelector(&#x27;#zvl-trigger-note&#x27;).textContent = params.triggerRank === null
+      ? params.peakHoldSeconds === 0
+        ? &#x27;无限保持峰值&#x27;
+        : `峰值保持${params.peakHoldSeconds}秒后下降`
+      : declineStart === null
+        ? params.peakHoldSeconds === 0
+          ? `到第${params.triggerRank}名后下降`
+          : `保持至少${params.peakHoldSeconds}秒，且到第${params.triggerRank}名后下降`
+        : `第${declineStart}秒触发下降`;
 
     const phaseEl = root.querySelector(&#x27;#zvl-phase&#x27;);
-    if (tick &lt; params.riseSeconds) phaseEl.textContent = `增长 · ${params.startRatio}→${params.peakRatio}倍`;
-    else if (declineStart === null) phaseEl.textContent = `保持${params.peakRatio}倍 · 等待触发`;
-    else if (tick &lt; declineStart + params.fallSeconds) phaseEl.textContent = `下降 · ${params.peakRatio}→${params.finalRatio}倍`;
-    else phaseEl.textContent = `稳定 · ${params.finalRatio}倍`;
+    let phaseLabel;
+    if (tick &lt; params.riseSeconds) phaseLabel = `增长 · ${params.startRatio}→${params.peakRatio}倍`;
+    else if (declineStart === null) phaseLabel = params.triggerRank === null
+      ? params.peakHoldSeconds === 0
+        ? `保持${params.peakRatio}倍 · 无限`
+        : `保持${params.peakRatio}倍 · 共${params.peakHoldSeconds}秒`
+      : params.peakHoldSeconds === 0
+        ? `保持${params.peakRatio}倍 · 等待第${params.triggerRank}名`
+        : `保持${params.peakRatio}倍 · 等待时间和名次条件`;
+    else if (tick &lt; declineStart + params.fallSeconds) phaseLabel = `下降 · ${params.peakRatio}→${params.finalRatio}倍`;
+    else phaseLabel = `稳定 · ${params.finalRatio}倍`;
+    phaseEl.textContent = defenseActive
+      ? `${phaseLabel} · 防御策略（第${defenseStart}秒切换）`
+      : `${phaseLabel} · 普通策略（最低到第${worstZeroRank}名）`;
 
     if (topReceivers.length) {
       root.querySelector(&#x27;#zvl-last-allocation&#x27;).textContent =
@@ -1461,6 +1521,7 @@ html&gt;body{padding:0}&lt;/style&gt;
   buildCharacterInputs();
   runEl.addEventListener(&#x27;click&#x27;, play);
   stepEl.addEventListener(&#x27;click&#x27;, simulateOne);
+  applyEl.addEventListener(&#x27;click&#x27;, applyLiveParams);
   resetEl.addEventListener(&#x27;click&#x27;, reset);
   speedEl.addEventListener(&#x27;change&#x27;, () =&gt; {
     if (timer !== null) {
